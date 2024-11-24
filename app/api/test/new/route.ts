@@ -31,6 +31,22 @@ export const POST = async (request: { json: () => Promise<{ userId: string; name
         // Save the new test to the database
         await newTest.save();
 
+
+        await fetch("http://127.0.0.1:8000/new-test", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId,
+                name,
+                projectName,
+                url,
+                csvData,
+                done
+            }),
+        });
+
+        
+
         return new Response(JSON.stringify(newTest), { status: 201 });
     } catch (error) {
         console.error("Error creating test:", error);
