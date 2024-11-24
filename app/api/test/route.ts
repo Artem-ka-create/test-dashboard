@@ -9,6 +9,8 @@ export const GET = async (request: any) => {
         await connectDB();
 
         const tests = await Test.find({}).populate('creator')
+        console.log('gotten tests from db->', tests);
+        
 
         return new Response(JSON.stringify(tests), {status:200})
     }catch(error){

@@ -1,24 +1,42 @@
-
 import { connectDB } from "@/app/database";
 import Test from "@/models/Test";
 
-
-
-export const POST = async (request: { json: () => PromiseLike<{ userId: any; url: any; csvData: any; done: any; }> | { userId: any; url: any; csvData: any; done: any; }; }) => {
+export const POST = async (request: { json: () => Promise<{ userId: string; name: string; projectName: string; url: string; csvData: string; done: boolean }> }) => {
     try {
-        const { userId, url, csvData, done } = await request.json();
-        
+        const { userId, name, projectName, url, csvData, done } = await request.json();
+
+        // Connect to the database
         await connectDB();
 
-        // Ensure all necessary fields are included
-        const newTest = new Test({ creator: userId, url, csvData, done });
-        
-        console.log(newTest);
+        // Validate required fields
+        if (!userId || !name || !projectName || !csvData) {
+            return new Response(
+                JSON.stringify({ error: "Missing required fields: userId, name, projectName, or csvData." }),
+                { status: 400 }
+            );
+        }
 
+        const newTest = new Test({
+            creator: userId,
+            name,
+            projectName,
+            url: url || null, // URL is optional
+            csvData,
+            done: done || false,
+            date: new Date // Default to false if not provided
+        });
+
+        console.log("Creating new test:", newTest);
+
+        // Save the new test to the database
         await newTest.save();
+
         return new Response(JSON.stringify(newTest), { status: 201 });
     } catch (error) {
-        console.error("Error creating test:", error); // Log the actual error
-        return new Response("Failed to create a new test", { status: 500 });
+        console.error("Error creating test:", error);
+        return new Response(
+            JSON.stringify({ error: "Failed to create a new test. Please try again later." }),
+            { status: 500 }
+        );
     }
 };
