@@ -29,13 +29,14 @@ export const POST = async (request: { json: () => Promise<{ userId: string; name
         console.log("Creating new test:", newTest);
 
         // Save the new test to the database
-        await newTest.save();
+        const savedTest = await newTest.save();
 
 
         await fetch("http://127.0.0.1:8000/new-test", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                id: savedTest._id,
                 userId,
                 name,
                 projectName,
