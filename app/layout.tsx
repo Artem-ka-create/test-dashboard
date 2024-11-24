@@ -16,7 +16,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Promptopia",
+  title: "PenTest",
   description: "Find best prompts",
 };
 
