@@ -15,6 +15,7 @@ const Home = () => {
         Optio iste possimus, quas sit molestias incidunt eaque repellendus culpa natus
       </p>
 
+      <image src='wave.svg' />
       <Feed />
     </section>
   )

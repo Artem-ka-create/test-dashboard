@@ -4,6 +4,25 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import Histogram from '@/app/components/Histgram';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { FaCheckCircle } from 'react-icons/fa';
+import { MdPending } from 'react-icons/md';
+import DoughnutChart from '@/app/components/DoughnutChart';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -17,6 +36,52 @@ interface Task {
   csvData: string;
   url?: string;
 }
+const attackList = ['SQL', 'BriteForce Atack', 'XSS', 'SiteMappping', 'DDOS']
+const attackNumbers = [10, 40, 10, 53, 3]
+
+
+const attackData = [
+  {
+    attackName: 'SQL Injection',
+    count: 23, // Total tests
+    subAttacks: [
+      { attackName: 'Blind SQL', count: 10, status: true }, // Passed
+      { attackName: 'Classic', count: 5, status: false }, // Failed
+      { attackName: 'Dumping DB', count: 8, status: true }, // Passed
+    ],
+  },
+  {
+    attackName: 'BruteForce Attack',
+    count: 18,
+    subAttacks: [
+      { attackName: 'Auth', count: 8, status: true },
+      { attackName: 'Cryptography', count: 5, status: false },
+      { attackName: 'Dictionary Attack', count: 5, status: false },
+    ],
+  },
+  {
+    attackName: 'XSS',
+    count: 30,
+    subAttacks: [
+      { attackName: 'DOM', count: 10, status: true },
+      { attackName: 'Reflected', count: 10, status: false },
+      { attackName: 'API', count: 10, status: false },
+    ],
+  },
+  {
+    attackName: 'Site Mapping',
+    count: 15,
+    status: true, // Overall status if there are no sub-attacks
+    subAttacks: [], // No sub-attacks
+  },
+  {
+    attackName: 'DDOS',
+    count: 40,
+    status: false, // Overall status if there are no sub-attacks
+    subAttacks: [], // No sub-attacks
+  },
+];
+
 
 const TaskDetail = () => {
   const pathname = usePathname();
@@ -80,44 +145,129 @@ const TaskDetail = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
-      <h1 className="text-3xl font-bold mb-4">{task.name}</h1>
-      <p className="text-lg text-gray-600 mb-2">
-        <strong>Project:</strong> {task.projectName}
-      </p>
-      <p className="text-lg mb-2">
-        <strong>Status:</strong>{' '}
-        <span className={`font-semibold ${task.done ? 'text-green-600' : 'text-red-600'}`}>
-          {task.done ? 'Completed' : 'Pending'}
-        </span>
-      </p>
-      <p className="text-lg mb-2">
-        <strong>Date:</strong> {new Date(task.date).toLocaleDateString()}
-      </p>
-      <p className="text-lg mb-4">
-        <strong>Time:</strong> {new Date(task.date).toLocaleTimeString()}
-      </p>
-      {task.url && (
-        <p className="mb-6">
-          <strong>URL:</strong>{' '}
-          <a href={task.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-            {task.url}
-          </a>
-        </p>
-      )}
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Task Progress</h2>
-        <div className="w-full">
-          <Bar data={chartData} options={chartOptions} />
-        </div>
-      </div>
+      <Card style={{ borderColor: '#e20074'}} className="w-full">
+        <CardHeader>
+          <CardTitle className="text-2xl">{task.name}</CardTitle>
+          <CardDescription>#{task.projectName}</CardDescription>
+        </CardHeader>
+        <CardContent>
 
-      <button
-        onClick={handleDownloadReport}
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-      >
+        <div className="flex items-center gap-4 mb-4">
+            {task.done ? (
+              <>
+                <FaCheckCircle className="text-green-500 text-2xl" />
+                <span className="text-green-600 font-semibold text-lg">Completed</span>
+              </>
+            ) : (
+              <>
+                <MdPending className="text-blue-500 text-2xl" />
+                <span className="text-blue-600 font-semibold text-lg">Pending</span>
+              </>
+            )}
+          </div>
+          <div className="text-gray-400 flex items-center justify-between">
+            <p className="text-lg mb-2">
+              {new Date(task.date).toLocaleDateString()}
+            </p>
+            <p className="text-lg mb-4">
+              {new Date(task.date).toLocaleTimeString()}
+            </p>
+          </div>
+
+          {task.url && (
+            <p className="mb-6">
+              <strong>URL:</strong>{' '}
+              <a href={task.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                {task.url}
+              </a>
+            </p>
+          )}
+        </CardContent>
+
+
+      </Card>
+
+
+      <h1 className="text-lg font-bold flex justify-center m-6">Provided Exploits</h1>
+
+
+      <Accordion type="single" collapsible className="w-full">
+        {attackData.map((attack, index) => (
+          <AccordionItem key={index} value={`item-${index}`}>
+            <AccordionTrigger>
+              <div className="flex justify-between items-center w-full">
+                <span>
+                  {attack.attackName} (Count: {attack.count})
+                </span>
+                <div className="flex items-center gap-2">
+                  {attack.status ? (
+                    <>
+                      <FaCheckCircle className="text-green-500 text-lg" />
+                      <p className="text-sm text-green-600">Completed</p>
+                    </>
+                  ) : (
+                    <>
+                      <MdPending className="text-blue-500 text-lg" />
+                      <p className="text-sm text-blue-600">Pending</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              {attack.subAttacks.length > 0 ? (
+                <>
+                  <ul className="ml-4 list-disc mb-4">
+                    {attack.subAttacks.map((subAttack, subIndex) => (
+                      <li key={subIndex} className="mb-2 flex justify-between items-center">
+                        <span>
+                          {subAttack.attackName} (Count: {subAttack.count})
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {subAttack.status ? (
+                            <>
+                              <FaCheckCircle className="text-green-500 text-lg" />
+                              <p className="text-sm text-green-600">Completed</p>
+                            </>
+                          ) : (
+                            <>
+                              <MdPending className="text-blue-500 text-lg" />
+                              <p className="text-sm text-blue-600">Pending</p>
+                            </>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {/* Histogram for sub-attacks */}
+                  <h3 className="text-md font-semibold mb-2">Sub-Attack Statistics</h3>
+                  <Histogram
+                    labels={attack.subAttacks.map((sub) => sub.attackName)}
+                    data={attack.subAttacks.map((sub) => sub.count)}
+                    title={`${attack.attackName} Sub-Attacks`}
+                  />
+                </>
+              ) : (
+                <p>No sub-attacks available.</p>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+
+
+
+      <h1 className="text-lg font-bold flex justify-center m-6">General Statistic</h1>
+
+      <Histogram labels={attackList} data={attackNumbers} title="Passed exploits number" />
+
+      <h1 className="text-lg font-bold flex justify-center m-6">Attack Overview</h1>
+      <DoughnutChart attackData={attackData} />
+
+      <Button className=" mt-10 w-full flex justify-center">
         Download Report
-      </button>
+      </Button>
     </div>
   );
 };

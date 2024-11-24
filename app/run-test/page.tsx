@@ -24,7 +24,7 @@ const CreateTest = () => {
                 body: JSON.stringify({
                     name: test.name,
                     projectName: test.projectName,
-                    url: test.url || "",
+                    url: test.url || null,
                     csvData: test.csvData,
                     userId: session?.user.id,
                     done: false,

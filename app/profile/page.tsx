@@ -26,9 +26,12 @@ const MyProfile = () => {
 
   return (
     <>
-      <h1> Your Tests </h1>
-      <div>{session?.user?.email}</div>
-      <Profile testsList={tests}/>
+      <div className="flex items-center justify-center flex-col">
+        <h1 className="text-2xl"> Your Tests </h1>
+        <div className="text-gray-600 mt-5 mb-3">{session?.user?.email}</div>
+      </div>
+
+      <Profile testsList={tests} />
     </>
   )
 }
